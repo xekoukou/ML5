@@ -1,0 +1,7 @@
+
+The prelude namespace is made up of:
+
+    1) The *bodies* of each module in here (so the outer file-name
+        module of each file doesn't matter)
+
+    2) The bodies of the "OpenInPrelude" submodules
