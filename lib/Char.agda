@@ -12,17 +12,16 @@ module Char where
     Char : Set
   
   {-# BUILTIN CHAR Char #-}
-  {-# COMPILED_TYPE Char Char #-}
   
   ------------------------------------------------------------------------
   -- Operations
   
   private
    primitive
-    primCharToNat    : Char → Nat.Nat
+    primCharToNat    : Char → Natm.Nat
     primCharEquality : Char → Char → Sums.Bool
   
-  toNat : Char → Nat.Nat
+  toNat : Char → Natm.Nat
   toNat = primCharToNat
   
   equal : Char -> Char -> Sums.Bool

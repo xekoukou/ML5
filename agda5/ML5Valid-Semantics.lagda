@@ -121,7 +121,7 @@ establishing that the interpretation is total and type-preserving.
 \begin{code}
   eval : ∀ {Γ L} → Γ ⊢ L → Everywhere interp-hyp Γ → interp-conc L
   ---- usual connectives
-  eval (▹ x) σ = (List.EW.there σ x)
+  eval (▹ x) σ = (Listm.EW.there σ x)
   eval (lam e) σ = λ x → eval e (x E:: σ)
   eval (app e1 e2) σ =  (eval e1 σ) >>= λ f → (eval e2 σ) >>= λ a → f a 
   eval (inl v) σ = Inl (eval v σ)
@@ -131,7 +131,7 @@ establishing that the interpretation is total and type-preserving.
     docase (Inl x) = eval e1 (x E:: σ)
     docase (Inr y) = eval e2 (y E:: σ)
   ---- ⌘ 
-  eval (▹v{w} x Refl) σ =  (List.EW.there σ x) w
+  eval (▹v{w} x Refl) σ =  (Listm.EW.there σ x) w
   eval (sham v) σ =  λ w' → (eval (v w') σ)
   eval (lets e e') σ = eval e σ >>= λ x → eval e' (x E:: σ)
   ---- at

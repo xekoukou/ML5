@@ -9,10 +9,10 @@ Figure~\ref{fig:ml5-revised}.  This makes it possible to implement some
 additional programs without communication.  For example, consider a
 function
 
-\noagda \begin{code}
+\noagda \begin{verbatim}
 move : ∀ {A w w'} → Mobile5 A → (value (A [ w ]) :: []) ⊢ exp (A [ w' ])
 move m =  (get5 (val (▹ i0)) m)
-\end{code}
+\end{verbatim}
 %
 Operationally, this is quite inefficient: it sends the value of the
 variable from \ttt{w'} to \ttt{w}, as the environment of the \ttt{val (▹
@@ -23,10 +23,10 @@ this function without communication in ML5.
 In our revised ML5, as in HL5, it can be implemented as a simple type
 coercion:
 
-\noagda \begin{code}
+\noagda \begin{verbatim}
 move : ∀ {A w w'} → Mobile5 A → (value (A [ w ]) :: []) ⊢ exp (A [ w' ])
 move m = val (vshift (▹ i0) m)
-\end{code}
+\end{verbatim}
 
 Second, in HL5, the worlding of values always "gets out of the way"
 because it commutes with type constructors down to \ttt{ref} and
@@ -38,11 +38,11 @@ projective elimination rule for \ttt{at} and ∀₅ values.
 We could additionally add elimination rules like \ttt{case},
 \ttt{split}, etc. to the syntactic class of "values"---i.e. we could
 admit that we are really dealing with a syntactic class of pure terms:
-\noagda \begin{code}
+\noagda \begin{verbatim}
  casev/val : ∀ {A B C w' w} → Γ ⊢ value (A ∨ B [ w ])  
    → (Γ ,, value (A [ w ]) ⊢ val (C [ w' ])) → (Γ ,, value (B [ w ]) ⊢ val (C [ w' ])) 
    → Γ ⊢ val (C [ w' ])
-\end{code}
+\end{verbatim}
 %
 However, in an operational semantics where worlds and types are erased
 at run-time, \ttt{wappv} and \ttt{unatv} will not create any real
@@ -98,7 +98,7 @@ module agda5.ML5Revised where
   Ctx = List Hyp
   _,,_ : ∀ {A} → List A → A → List A
   Γ ,, A = A :: Γ
-  infixl 10 _,,_
+  infixl 11 _,,_
 
   data _⊢_ (Γ : Ctx) : Conc → Set where
 
@@ -226,7 +226,7 @@ Remove rules \ttt{put}, \ttt{▹v}, \ttt{lets}, \ttt{sham}, \ttt{wapp},
     interp-conc (exp L) = ◯ (eff (fst L)) < (snd L) >
 
     eval : ∀ {Γ L} → Γ ⊢ L → Everywhere interp-hyp Γ → interp-conc L
-    eval (▹ x) σ = (List.EW.there σ x)
+    eval (▹ x) σ = (Listm.EW.there σ x)
     eval (lam e) σ = (\ x →  eval e (x E:: σ) )
     eval (pair v1 v2) σ = eval v1 σ , eval v2 σ
     eval mt σ = <>
@@ -278,7 +278,7 @@ but because all value assumptions are worlded, we must pick one.
 \ignore{
 \begin{code}
   module Derived where
-   open List.Subset 
+   open Listm.Subset 
 
    postulate
      weaken : ∀ {Γ Γ' J} → Γ ⊆ Γ' → Γ ⊢ J → Γ' ⊢ J
@@ -337,7 +337,7 @@ connectives are derivable using the generalized ones.
      → Γ ⊢ exp ((A at w') [ w ])  
      → (Γ ,, value (A [ w' ]) ⊢ exp (C [ w ]))
      → Γ ⊢ exp (C [ w ])
-   leta e1 e2 = lete e1 (letv (unatv (▹ i0)) (weaken (List.Subset.extend⊆ iS) e2))
+   leta e1 e2 = lete e1 (letv (unatv (▹ i0)) (weaken (Listm.Subset.extend⊆ iS) e2))
 
    -- expression left-rules can be a derived form without communication when the worlds match
  

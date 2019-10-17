@@ -138,11 +138,11 @@ follows:
 Term variables \ttt{x} and \ttt{u} are represented by
 well-scoped de Bruijn indices---pointers into Γ:
 
-\noagda \begin{code}
+\noagda \begin{verbatim}
 data _∈_ {A : Set} : A → List A → Set where
  i0 : {α : A}   {Γ : List A} → α ∈ (α :: Γ)
  iS : {α α' : A} {Γ : List A} → α ∈ Γ → α ∈ (α' :: Γ)
-\end{code}
+\end{verbatim}
 
 The typing rules are defined in Figure~\ref{fig:ml5-typing}.  The first
 rule says that \ttt{(▹ x)} is a value if \ttt{x} is a de Bruijn index
@@ -190,7 +190,7 @@ with valid values is included in the companion code.
 \begin{code}
   _,,_ : ∀ {A} → List A → A → List A
   Γ ,, A = A :: Γ
-  infixl 10 _,,_
+  infixl 11 _,,_
 \end{code}}
 \begin{code}
   data _⊢_ (Γ : Ctx) : Conc → Set where

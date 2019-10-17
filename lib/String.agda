@@ -10,14 +10,13 @@ module String where
   module StringOP where
     postulate String : Set
     {-# BUILTIN STRING  String #-}
-    {-# COMPILED_TYPE String String #-}
 
   open StringOP public
 
   private
     primitive
-       primStringToList   : String -> List.List Char.Char
-       primStringFromList : List.List Char.Char -> String
+       primStringToList   : String -> Listm.List Char.Char
+       primStringFromList : Listm.List Char.Char -> String
        primStringAppend   : String -> String -> String
        primStringEquality : String -> String -> Sums.Bool
 
@@ -31,25 +30,26 @@ module String where
   string-append = primStringAppend
 
   -- function: is this a boundary char?
-  split : String -> (Char.Char -> Sums.Bool) -> List.List String
-  split s f = split' (toList s) List.[] where 
-    reconstruct : List.List Char.Char -> String
-    reconstruct l = fromList (List.reverse l)
+  split : String -> (Char.Char -> Sums.Bool) -> Listm.List String
+  split s f = split' (toList s) Listm.[] where 
+    reconstruct : Listm.List Char.Char -> String
+    reconstruct l = fromList (Listm.reverse l)
 
-    split' : List.List Char.Char -> List.List Char.Char -> List.List String
-    split' List.[] currentword = List._::_ (reconstruct currentword) List.[] 
-    split' (List._::_ x xs) currentword with f x
-    ... | Sums.True  = List._::_ (reconstruct currentword) (split' xs List.[])  
-    ... | Sums.False = split' xs (List._::_ x currentword)
+    split' : Listm.List Char.Char -> Listm.List Char.Char -> Listm.List String
+    split' Listm.[] currentword = Listm._::_ (reconstruct currentword) Listm.[] 
+    split' (Listm._::_ x xs) currentword with f x
+    ... | Sums.True  = Listm._::_ (reconstruct currentword) (split' xs Listm.[])  
+    ... | Sums.False = split' xs (Listm._::_ x currentword)
 
+  private
+    postulate
+      primTrustMe : ∀ {A : Set} {x y : A} -> Idm.Id x y
 
-  private primitive primTrustMe : ∀ {A : Set} {x y : A} -> Id.Id x y
-
-  equal/id : (x y : String) -> Sums.Maybe (Id.Id x y)
+  equal/id : (x y : String) -> Sums.Maybe (Idm.Id x y)
   equal/id s₁ s₂ with (equal s₁ s₂)
   ... | Sums.True  = Sums.Some primTrustMe
   ... | Sums.False = Sums.None 
 
 
   postulate 
-    same-eq : {s : String} -> Id.Id (equal s s) Sums.True
+    same-eq : {s : String} -> Idm.Id (equal s s) Sums.True

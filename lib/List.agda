@@ -3,15 +3,15 @@ open import lib.SumsProds
 open Sums
 open Prods
 open import lib.Nat
-open Nat
+open Natm
 open import lib.NatThms
 open NatThms
 open import lib.Id
-open Id 
+open Idm 
 
 module lib.List where
 
-module List where
+module Listm where
 
   module ListOP where
 
@@ -19,10 +19,7 @@ module List where
       []  : List a
       _::_ : a -> List a -> List a 
 
-    {-# COMPILED_DATA List [] [] (:) #-}
     {-# BUILTIN LIST List #-}
-    {-# BUILTIN NIL [] #-}
-    {-# BUILTIN CONS _::_ #-}
 
     infixr 99 _::_
     
@@ -67,7 +64,7 @@ module List where
   ...                       | .tl            | Refl = Refl
 
   appendmayber-is-append : {A : Set} -> (l1 l2 : List A) -> Id (appendmayber l1 l2) (append l1 l2)
-  appendmayber-is-append _ [] = Id.sym (append-rh-[] _)
+  appendmayber-is-append _ [] = Idm.sym (append-rh-[] _)
   appendmayber-is-append _ (x :: xs) = Refl
 
   _++_ : {a : Set} -> List a -> List a -> List a
@@ -76,7 +73,7 @@ module List where
 
   append-assoc : {A : Set} {l1 l2 l3 : List A} -> Id ((l1 ++ l2) ++ l3) (l1 ++ (l2 ++ l3))
   append-assoc {_}{[]} {l2} {l3} = Refl
-  append-assoc {_}{x1 :: l1} {l2} {l3} = Id.substeq (\xs -> x1 :: xs) (append-assoc {_} {l1} {l2} {l3})
+  append-assoc {_}{x1 :: l1} {l2} {l3} = Idm.substeq (\xs -> x1 :: xs) (append-assoc {_} {l1} {l2} {l3})
 
   fold : {a b : Set} -> b -> (a -> b -> b) -> List a -> b
   fold n c [] = n
@@ -96,28 +93,28 @@ module List where
 
   append-maps : {A B : Set} (l1 l2 : List A) {f : A -> B} -> Id ((map f l1) ++ (map f l2)) (map f (append l1 l2))
   append-maps []        l2 = Refl
-  append-maps (x :: l1) l2 {f} = Id.substeq (\ l -> f x :: l)  (append-maps l1 l2)
+  append-maps (x :: l1) l2 {f} = Idm.substeq (\ l -> f x :: l)  (append-maps l1 l2)
 
   fuse-map : ∀ {A B C} {f : A -> B} {g : B -> C} (l : List A) -> Id (map g (map f l)) (map (\ x -> g (f x)) l) 
   fuse-map [] = Refl
-  fuse-map {f = f} {g = g} (x :: xs) = Id.substeq (\ xs -> (g (f x)) :: xs) (fuse-map xs)
+  fuse-map {f = f} {g = g} (x :: xs) = Idm.substeq (\ xs -> (g (f x)) :: xs) (fuse-map xs)
 
   map-ext : ∀ {A B} {f g : A -> B} -> ((x : A) -> Id (f x) (g x)) -> (l : List A) -> Id (map f l) (map g l)
   map-ext id [] = Refl
-  map-ext id (x :: xs) = Id.substeq2 _::_ (id x) (map-ext id xs)
+  map-ext id (x :: xs) = Idm.substeq2 _::_ (id x) (map-ext id xs)
   
   map-compose : ∀ {A B B' C} {f : A -> B} {g : B -> C} {f' : A -> B'} {g' : B' -> C} {l : List A}
               -> ((x : A) -> Id (g (f x)) (g' (f' x))) 
               -> Id (map g (map f l)) (map g' (map f' l))
-  map-compose {l = l} id = Id.trans (fuse-map l) (Id.trans (map-ext id l) (Id.sym (fuse-map l)))
+  map-compose {l = l} id = Idm.trans (fuse-map l) (Idm.trans (map-ext id l) (Idm.sym (fuse-map l)))
 
   fold-map : ∀ {A B C} {f : A -> B} {n : C} {c : B -> C -> C} 
            -> (l : List A)
            -> Id (fold n c (map f l)) (fold n (\ hd r -> c (f hd) r) l)
   fold-map [] = Refl
-  fold-map{f = f}{c = c} (x :: xs) = Id.substeq (\ tl -> c (f x) tl) (fold-map xs)
+  fold-map{f = f}{c = c} (x :: xs) = Idm.substeq (\ tl -> c (f x) tl) (fold-map xs)
   
-  length : forall {a} -> List a -> Nat.Nat
+  length : forall {a} -> List a -> Natm.Nat
   length []       = Nat.Z
   length (x :: xs) = S (length xs)
 
@@ -177,8 +174,8 @@ module List where
   ...                           | False with-eq p with (f x')
   in-filter x (x' :: xs) f i    | False with-eq ()   | True 
   ...                                                | False = iS (fst (in-filter x xs f i)) , snd (in-filter x xs f i)
-  in-filter x (x' :: xs) f i    | True with-eq p with fire-filter _ _ _ _ i p
-  in-filter x (.x :: xs) f i    | True with-eq p    | i0 = i0 , sym p 
+  in-filter x (x' :: xs) f i    | True with-eq p with fire-filter x x' xs f i p
+  ...                                               | i0 = i0 , sym p 
   ...                                               | (iS i') = iS (fst (in-filter x xs f i')) , snd (in-filter x xs f i') 
 
   filterp : {a b : Set} -> (f : a -> Maybe b) -> List a -> List a
@@ -312,7 +309,7 @@ module List where
     commute-map-remove : {A B : Set} {f : A -> B} {x : A} (l : List A) (i : x ∈ l) -> Id (map f (remove l i)) (remove (map f l) (in-map i))
     commute-map-remove [] () 
     commute-map-remove (x :: xs) i0 = Refl
-    commute-map-remove {f = f} (x :: xs) (iS i) = Id.substeq (\l -> (f x) :: l) (commute-map-remove xs i)
+    commute-map-remove {f = f} (x :: xs) (iS i) = Idm.substeq (\l -> (f x) :: l) (commute-map-remove xs i)
 
     find-in : {A : Set} -> (p : (A -> Bool)) -> (l : List A) -> Maybe (Σ \ (x : A) -> (x ∈ l) × Check (p x))
     find-in f [] = None
@@ -349,11 +346,11 @@ module List where
 
     remove/append : ∀ {A : Set} (l1 : List A) {l2 : List A} {x : A} (i : x ∈ l2) -> Id (l1 ++ (l2 - i)) ((l1 ++ l2) - skip l1 i)
     remove/append [] l2 = Refl
-    remove/append (x :: xs) l2 = Id.substeq2 _::_ Refl  (remove/append xs l2)
+    remove/append (x :: xs) l2 = Idm.substeq2 _::_ Refl  (remove/append xs l2)
 
     remove/middle : ∀ {A : Set} (l1 : List A) {l2 : List A} {x : A} -> Id (remove (l1 ++ (x :: l2)) (skip l1 i0)) (l1 ++ l2)
     remove/middle [] = Refl
-    remove/middle (y :: xs) = Id.substeq2 _::_ Refl (remove/middle xs) 
+    remove/middle (y :: xs) = Idm.substeq2 _::_ Refl (remove/middle xs) 
 
     split-at : ∀ {A} {l : List A} {x : A} (i : x ∈ l) -> List A × List A
     split-at {A} {_ :: l} i0 = l , []
@@ -368,17 +365,17 @@ module List where
   
     split-at-combine : ∀ {A} {l : List A} {x : A} (i : x ∈ l) -> Id l ((snd (split-at i)) ++ (x :: (fst (split-at i))))
     split-at-combine i0 = Refl
-    split-at-combine {_}{x :: _} (iS i) = Id.substeq (\ xs -> x :: xs) (split-at-combine i)
+    split-at-combine {_}{x :: _} (iS i) = Idm.substeq (\ xs -> x :: xs) (split-at-combine i)
   
     split-at-remove : ∀ {A} {l : List A} {x : A} (i : x ∈ l) -> Id (remove l i) ((snd (split-at i)) ++ (fst (split-at i)))
     split-at-remove i0 = Refl
-    split-at-remove{l = x' :: _} (iS i) = Id.substeq (\ xs -> x' :: xs) (split-at-remove i)
+    split-at-remove{l = x' :: _} (iS i) = Idm.substeq (\ xs -> x' :: xs) (split-at-remove i)
   
     split-at/map : ∀ {A B}  {l : List A} {x : A} (i : x ∈ l) {f : A -> B} -> 
                 Id (map f (fst (split-at i))) (fst (split-at (in-map{_}{_}{_}{_}{f} i)))
               × Id (map f (snd (split-at i))) (snd (split-at (in-map{_}{_}{_}{_}{f} i)))
     split-at/map i0 = Refl , Refl
-    split-at/map {l = x :: _} (iS i) {f} =  fst (split-at/map i) , Id.substeq (\ l -> f x :: l) (snd (split-at/map i)) 
+    split-at/map {l = x :: _} (iS i) {f} =  fst (split-at/map i) , Idm.substeq (\ l -> f x :: l) (snd (split-at/map i)) 
    
 
   module Replace {A : Set} (eq : (x y : A) -> Maybe (Id x y)) where
@@ -398,7 +395,7 @@ module List where
                -> Maybe (Replace x y (l :: ls) (l' :: ls'))
       proveReplaceTl x y  ls ls' None = None
       proveReplaceTl {l}{l'} x y  ls ls' (Some (rep i p)) with (eq l l') 
-      ... | (Some p1) = Some (rep (iS i) (Id.substeq2 _::_ p1 p))
+      ... | (Some p1) = Some (rep (iS i) (Idm.substeq2 _::_ p1 p))
       ... | None = None
     
       proveReplaceE : (x y : A ) (L1 L2 : List A) -> Maybe (Replace x y L1 L2)
@@ -421,10 +418,10 @@ module List where
     double-replace : {l : List A} {x y : A} (i : x ∈ l) 
                    -> Id l (replace x (∈replace{y} i))
     double-replace i0 = Refl
-    double-replace (iS{x} i) = Id.substeq (\ l -> x :: l) (double-replace i) 
+    double-replace (iS{x} i) = Idm.substeq (\ l -> x :: l) (double-replace i) 
     
     replace-sym : ∀ {x y l1 l2} -> Replace x y l1 l2 -> Replace y x l2 l1
-    replace-sym (rep i Refl) = rep (∈replace i) (Id.sym (double-replace i))
+    replace-sym (rep i Refl) = rep (∈replace i) (Idm.sym (double-replace i))
     
     forgetLemma : ∀ { x y} -> Check (Sums.forgetMaybe2 eq x y) -> Id x y
     forgetLemma {x} {y} c with (eq x y)
@@ -521,7 +518,7 @@ module List where
 
     extend⊆-ext : ∀ {A x} {Ω Ω' : List A} -> {w1 w2 : Ω ⊆ Ω'} -> ⊆Eq w1 w2 -> ⊆Eq (extend⊆{_}{x} w1) (extend⊆ w2)
     extend⊆-ext wid i0 = Refl
-    extend⊆-ext wid (iS i) = Id.substeq iS (wid i)
+    extend⊆-ext wid (iS i) = Idm.substeq iS (wid i)
 
     extend⊆-compose : ∀ {A x} {Ω1 Ω2 Ω3 : List A} -> {w2 : Ω2 ⊆ Ω3} {w1 : Ω1 ⊆ Ω2} 
                     -> ⊆Eq (extend⊆{_}{x} (w2 ∘⊆ w1)) ((extend⊆ w2) ∘⊆ (extend⊆ w1))
@@ -703,9 +700,9 @@ module List where
                      -> {is : List I} 
                      -> (xs : Everywhere El1 is)
                      -> Id (mapew g (mapew f xs)) (mapew g' (mapew f' xs))
-      map-compose-eq f f' g g' id xs = Id.trans (Id.trans fuse1 comp) fuse2  where
+      map-compose-eq f f' g g' id xs = Idm.trans (Idm.trans fuse1 comp) fuse2  where
         fuse1 = fuse-mapew g f xs
-        fuse2 = Id.sym (fuse-mapew g' f' xs)
+        fuse2 = Idm.sym (fuse-mapew g' f' xs)
         comp  = map-eq _ _ id xs
 
       remove-map : {I : Set} {El1 : I -> Set} {El2 : I -> Set} 
@@ -721,7 +718,7 @@ module List where
              -> (xs : Everywhere El1 is)
              -> Id (mapew (\x -> x) xs) xs
       map-id E[] = Refl
-      map-id (x E:: xs) = Id.substeq (\xs -> x E:: xs) (map-id xs)
+      map-id (x E:: xs) = Idm.substeq (\xs -> x E:: xs) (map-id xs)
 
   module EW2 where
     open In

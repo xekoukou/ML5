@@ -2,7 +2,7 @@ open import lib.SumsProds
 
 module lib.EqSet where
 
-module EqSet where
+module EqSetm where
 
   data EqSet : Set1 where
     Eq : (t : Set) -> (t -> t -> Sums.Bool) -> EqSet

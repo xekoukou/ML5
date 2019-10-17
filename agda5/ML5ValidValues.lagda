@@ -160,7 +160,7 @@ module agda5.ML5ValidValues where
     eff-mobile (m⌘5{A}) {w1}{w2} = (i∀{\ w -> eff (A w) at w} \w → iat{eff (A w)}{w}{w1}{w2}) {w1}{w2}
 
     eval : ∀ {Γ L} -> Γ ⊢ L -> Everywhere interp-hyp Γ -> interp-conc L
-    eval (▹ x) σ = (List.EW.there σ x)
+    eval (▹ x) σ = (Listm.EW.there σ x)
     eval (vval s) σ = (eval s σ) _ 
     eval (lam e) σ = (\ x ->  eval e (x E:: σ) )
     eval (pair v1 v2) σ = eval v1 σ , eval v2 σ
@@ -171,7 +171,7 @@ module agda5.ML5ValidValues where
     eval (wlam v) σ = (\ w -> eval (v w) σ)
     eval (wpair w v) σ = w , eval v σ
     eval (sham v) σ = \ w' -> (eval v σ) w'
-    eval (▹valid x) σ = (List.EW.there σ x)
+    eval (▹valid x) σ = (Listm.EW.there σ x)
     eval (valv v) σ = \ w' -> eval (v w') σ
     eval (val v) σ = return (eval v σ)
     eval (lete e1 e2) σ = eval e1 σ >>= \ x -> eval e2 (x E:: σ)

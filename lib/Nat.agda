@@ -7,8 +7,6 @@ module Natm where
       S : Nat -> Nat
 
     {-# BUILTIN NATURAL Nat #-}
-    {-# BUILTIN SUC S #-}
-    {-# BUILTIN ZERO Z #-}
 
   open NatOP public
 

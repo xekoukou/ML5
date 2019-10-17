@@ -22,7 +22,7 @@ module lib.Prelude where
   open String.StringOP public
 
   open import lib.List public 
-  open List.ListOP public
+  open Listm.ListOP public
 
   open import lib.Vector public
 

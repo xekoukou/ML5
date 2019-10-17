@@ -6,7 +6,6 @@ module Idm where
     data Id {A : Set} : A -> A -> Set where
       Refl : {a : A} -> Id a a
     {-# BUILTIN EQUALITY Id #-}
-    {-# BUILTIN REFL Refl #-}
   
     data HId {A : Set} (a : A) : {B : Set} -> B -> Set where
       HRefl : HId a a 

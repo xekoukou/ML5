@@ -1,3 +1,6 @@
+\newcommand{\noagda}[0]{}
+\newcommand{\ignore}[1]{}
+
 \ignore{
 \begin{code}
 open import lib.Prelude hiding ([_])
@@ -141,9 +144,9 @@ w >}, which takes a modal type and a world and produces an Agda
 \ttt{Set}.  Using modal types, we can rewrite the type of \ttt{update}
 as follows:
 
-\noagda \begin{code}
+\noagda \begin{verbatim}
   update  : (((ref (◯ ⊤)) at server)  ⊃  ◯ ⊤  ⊃  ◯ ⊤) < client >
-\end{code}
+\end{verbatim}
 %
 The type \ttt{((ref (◯ ⊤)) at server) ⊃ ◯ ⊤ ⊃ ◯ ⊤} says that
 \ttt{update} takes a reference to a computation, located at the server,
@@ -154,9 +157,9 @@ relative to the client.
 
 The above polymorphic \ttt{update'} is typed as follows: 
 
-\noagda \begin{code}
+\noagda \begin{verbatim}
   update' : (□(∀₅ (λ w2 → ref (◯ ⊤) at w2  ⊃  ◯ ⊤ ⊃ ◯ ⊤))) <*>
-\end{code}
+\end{verbatim}
 %
 where the postfix symbol \ttt{<*> : Type → Set} means that the
 proposition is true in all worlds (i.e. \ttt{A <*>} means the Agda type
@@ -338,9 +341,9 @@ Having considered return and bind, it is natural to ask what hybrid type
 can we ascribe to the \ttt{get} operation on the indexed monad \ttt{IO w
 A}. If we try defining
 
-\noagda \begin{code}
+\noagda \begin{verbatim}
     hl5get : ∀ {A w1 w2} → ((◯ A) at w1) ⊃ ((◯ A) at w2) <*>
-\end{code}
+\end{verbatim}
 %
 we see that \ttt{hl5get} must transform \ttt{IO w1 (A < w1 >)} into \ttt{IO
 w2 (A < w2 >)}.  L5 \ttt{get} satisfies this requirement if \ttt{A} is a
@@ -355,7 +358,7 @@ w2 (A < w2 >)}.  L5 \ttt{get} satisfies this requirement if \ttt{A} is a
     eq→ : ∀ {A1 A2 B1 B2 : Set} → EqSet B1 A1 → EqSet A2 B2 → EqSet (A1 → A2) (B1 → B2)
     eq× : ∀ {A1 A2 B1 B2 : Set} → EqSet A1 B1 → EqSet A2 B2 → EqSet (A1 × A2) (B1 × B2)
     eqEither : ∀ {A1 A2 B1 B2 : Set} → EqSet A1 B1 → EqSet A2 B2 → EqSet (Either A1 A2) (Either B1 B2)
-    eqΠ : ∀ {A} {B1 B2 : A → Set} → ((x : A) → EqSet (B1 x) (B2 x)) → EqSet ((x : A) → B1 x) ((x : A) → B2 x)
+    eqΠ : ∀ {A : Set} {B1 B2 : A → Set} → ((x : A) → EqSet (B1 x) (B2 x)) → EqSet ((x : A) → B1 x) ((x : A) → B2 x)
     eqΣ : ∀ {A} {B1 B2 : A → Set} → ((x : A) → EqSet (B1 x) (B2 x)) → EqSet (Σ \ (x : A) → B1 x) (Σ \ (x : A) → B2 x)
     eqRefl : ∀ {A} → EqSet A A
 
@@ -471,7 +474,7 @@ value with a coercion from the world \ttt{wFrom} to the world \ttt{wTo}:
   m⊥ () _
 
   mlist : ∀ {A} → Boxable A → Boxable (list A)
-  mlist mA l wTo = List.map (\ x → mA x wTo) l
+  mlist mA l wTo = Listm.map (\ x → mA x wTo) l
 \end{code}}
 %
 
@@ -525,7 +528,7 @@ It is convenient to define an alternate version of mobility where
   Eq ⊤ _ _ = Unit
   Eq ⊥ () ()
   Eq (∀₅ A) e1 e2 = (w : _) → Eq (A w) (e1 w) (e2 w)
-  Eq (∃₅ A){w} e1 e2 =  Σ \ (p : Id (fst e1) (fst e2)) → Eq (A (fst e1)) (snd e1) (Id.subst (\ x → A x < w >) (Id.sym p) (snd e2)) 
+  Eq (∃₅ A){w} e1 e2 =  Σ \ (p : Id (fst e1) (fst e2)) → Eq (A (fst e1)) (snd e1) (Idm.subst (\ x → A x < w >) (Idm.sym p) (snd e2)) 
     -- kinda cludgey 
   Eq (↓₅ A) e1 e2 = Eq (A _) e1 e2 
   Eq (◯ A) e1 e2 = Id e1 e2 -- punt

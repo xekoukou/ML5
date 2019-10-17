@@ -1,17 +1,17 @@
 open import lib.Nat
-open Nat
+open Natm
 open import lib.NatThms
 open NatThms
 open import lib.SumsProds
 open Prods.ProdsOP
 open import lib.Id
-open Id
+open Idm
 open import lib.List
-open List.ListOP
+open Listm.ListOP
 
 module lib.Vector where
 
-module Vec where
+module Vecm where
   data Vec (a : Set) : Nat -> Set where
     Nil  : Vec a Z
     Cons : {n : _} -> a -> Vec a n -> Vec a (S n)
@@ -35,12 +35,12 @@ module Vec where
 
   map-id : forall {A n} (v : Vec A n) -> Id (map (\ x -> x) v) v
   map-id Nil = Refl
-  map-id (Cons y y') = Id.substeq (\ y' -> Cons y y') (map-id y')
+  map-id (Cons y y') = Idm.substeq (\ y' -> Cons y y') (map-id y')
 
   map-compose : forall {A B C n} (f : A -> B) (g : B -> C) (v : Vec A n)
               -> Id (map (\ x -> (g (f x))) v) (map g (map f v))
   map-compose f g Nil = Refl
-  map-compose f g (Cons x xs) = Id.substeq (\ y -> Cons (g (f x)) y) (map-compose f g xs)
+  map-compose f g (Cons x xs) = Idm.substeq (\ y -> Cons (g (f x)) y) (map-compose f g xs)
   
   Snoc : forall {a n} -> Vec a n -> a -> Vec a  (n + 1)
   Snoc {a} {n} v x = append v (Cons x Nil)
@@ -75,7 +75,7 @@ module Vec where
   zip Nil Nil = Nil
   zip (Cons x xs) (Cons y ys) = Cons (x , y) (zip xs ys)
   
-module Vec1 where
+module Vecm1 where
 
 -- FIXME: better solution than copying the entire thing?
   

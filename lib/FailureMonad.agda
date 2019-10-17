@@ -21,8 +21,8 @@ module FailureMonad where
   fail : ∀ {A} -> Maybe A
   fail = None
 
-  or : ∀ {A} -> List.List (Maybe A) -> Maybe A
-  or = List.fold fail _||_
+  or : ∀ {A} -> Listm.List (Maybe A) -> Maybe A
+  or = Listm.fold fail _||_
 
   map : ∀ {A B} -> (A -> B) -> Maybe A -> Maybe B
   map = Sums.mapMaybe 
