@@ -249,19 +249,19 @@ corresponding Agda code):
     infix 104 ◇_ -- more tightly than [ ] 
 
     ⊞_ : (World → Type) → Type
-    ⊞_ A = ∀₅ (\ w → (A w) at w)
+    ⊞_ A = ∀₅ (λ w → (A w) at w)
 
     □_ : Type → Type
-    □_ A = ∀₅ (\ w → A at w)
+    □_ A = ∀₅ (λ w → A at w)
 
     ◇_ : Type → Type
-    ◇_ A = ∃₅ (\ w → A at w)
+    ◇_ A = ∃₅ (λ w → A at w)
 
     _<*> : Type → Set
     _<*> A = ∀ {w} → A < w >
 
     □refl : ∀ {A} → (□ A ⊃ A) <*>
-    □refl {A} {w} = \ f → f w
+    □refl {A} {w} = λ f → f w
 
     K : ∀ {A B} → (□ (A ⊃ B) ⊃ □ A ⊃ □ B) <*>
     K f x w = f w (x w) 
@@ -279,7 +279,7 @@ corresponding Agda code):
 \ignore{
 \begin{code}
     curry : ∀ {A B} → ((◇ A ⊃ □ B) ⊃ □ (A ⊃ B)) <*>
-    curry = \ f w' x → f (w' , x) w'
+    curry f w' a = f (w' , a) w'
 
     □trans : ∀ {A} → ((□ A) ⊃ (□ □ A)) <*>
     □trans = \ f → \ _ w' → f w'
@@ -300,10 +300,10 @@ corresponding Agda code):
     □5 = \ x _ → x
 
     update2  : (((ref (◯ ⊤)) at server)  ⊃  ◯ ⊤  ⊃  ◯ ⊤) < client >
-    update2 l clicomp = get{server} (l := (get{client} clicomp)) 
+    update2 l clicomp = get (l := (get clicomp)) 
 
     update2' : (w : World) → (∀₅ (λ w' → (ref (◯ ⊤) at w') ⊃ ◯ ⊤ ⊃ ◯ ⊤)) < w >
-    update2' w w' l clicomp = get{w'} (l := (get{w} clicomp))
+    update2' w w' l clicomp = get (l := (get clicomp))
 \end{code}}
 
 \noindent Indeed, one can check that this definition validates all of
@@ -354,7 +354,7 @@ w2 (A < w2 >)}.  L5 \ttt{get} satisfies this requirement if \ttt{A} is a
 \begin{code}
   open Axioms
 
-  data EqSet : (A B : Set) → Set1 where
+  data EqSet : (A B : Set) → Set₁ where
     eq→ : ∀ {A1 A2 B1 B2 : Set} → EqSet B1 A1 → EqSet A2 B2 → EqSet (A1 → A2) (B1 → B2)
     eq× : ∀ {A1 A2 B1 B2 : Set} → EqSet A1 B1 → EqSet A2 B2 → EqSet (A1 × A2) (B1 × B2)
     eqEither : ∀ {A1 A2 B1 B2 : Set} → EqSet A1 B1 → EqSet A2 B2 → EqSet (Either A1 A2) (Either B1 B2)
@@ -376,7 +376,7 @@ We characterize constant modal types by the property that they yield the
 same \ttt{Set} for any two arguments:
 
 \begin{code}  
-  Constant : Type → Set1
+  Constant : Type → Set₁
   Constant A = ∀ {w w'} → EqSet (A < w >) (A < w' >)
 \end{code}
 %
@@ -460,7 +460,7 @@ value with a coercion from the world \ttt{wFrom} to the world \ttt{wTo}:
   m∃ mA (w , e) wTo = w , (mA w) e wTo
 
   m◯  : ∀ {A} → Boxable A → Boxable (◯ A)
-  m◯ mA e wTo = (get e) >>= λ x → return (mA x wTo)
+  m◯ mA e wTo = get e >>= λ x → return (mA x wTo)
 \end{code}
 \ignore{
 \begin{code}
